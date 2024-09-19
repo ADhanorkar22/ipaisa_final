@@ -829,6 +829,7 @@ public class UsersController {
 
 	     // Check if the combined list is empty
 	     if (allTransactions.isEmpty()) {
+	    	 System.out.println();
 	         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("NO CONTENT");
 //	         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse("No data found", false));
 	     }

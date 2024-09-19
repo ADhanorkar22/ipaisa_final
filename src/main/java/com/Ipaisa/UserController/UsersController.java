@@ -50,6 +50,8 @@ import com.Ipaisa.dto.UpUser;
 import com.Ipaisa.dto.WalletTransactionDTO;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Validated
 @RestController
@@ -969,6 +971,44 @@ public class UsersController {
 	     // Return the list of transactions
 	  
 	     return ResponseEntity.ok(allTransactions);
+	 }
+	 
+	 
+	 @GetMapping("/getLatestTxn")
+	 public ResponseEntity<?> getLatestFiveTxn(@RequestHeader("Authorization") String token) {
+	 	
+		 if (token == null || !token.startsWith("Bearer ")) {
+	         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse("Invalid Authorization header", false));
+	     }
+
+	     String jwtToken = token.substring(7);
+	     String username;
+	     try {
+	         username = utils.getUserNameFromJwtToken(jwtToken);
+	     } catch (Exception e) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Invalid JWT token", false));
+	     }
+
+	     // Load user details from the username in the token
+	     UserDetails userDetails;
+	     try {
+	         userDetails = udeatils.loadUserByUsername(username);
+	     } catch (UsernameNotFoundException e) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<Object>("User not found", false));
+	     }
+
+	     String mobileno = userDetails.getUsername();
+
+	     // Fetch the user by mobile number
+	     User u = uRepo.findByMobileNumber(mobileno);
+	     if (u == null) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("User not found in the database", false));
+	     }
+		 
+	     
+		 
+		 
+		 return ResponseEntity.ok(this.tserv.getLatestTxn(u));
 	 }
 	 
 
